@@ -1,12 +1,17 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+import uvicorn
+import datetime
+import json
 
 app = FastAPI()
 
-@app.post("/submit-kompis")
-async def submit_kompis(request: Request):
+@app.post("/submit")
+async def receive_entry(request: Request):
     data = await request.json()
-    print("Received Kompis data:", data)
+    data["timestamp"] = datetime.datetime.now().isoformat()
 
-    # TODO: Save to file, database, or forward as needed
-    return JSONResponse(content={"status": "ok", "message": "Data received"})
+    with open("memory.json", "a") as f:
+        f.write(json.dumps(data) + "\n")
+
+    return JSONResponse(content={"status": "success", "received": data})
